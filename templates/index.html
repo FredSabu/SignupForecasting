@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ridge Regression Forecasting</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        
+        .container {
+            width: 80%;
+            margin: 0 auto;
+        }
+
+        header {
+            background-color: transparent;
+            color: #fff;
+            padding: 20px 0;
+            text-align: center;
+        }
+
+        .form-container {
+            background: #fff;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            font-size: 24px;
+            color: #333;
+        }
+
+        label {
+            display: block;
+            margin: 15px 0 5px;
+        }
+
+        input, select, button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px; 
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box; 
+        }
+
+        button {
+            background-color: #0056b3;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #004494;
+        }
+
+        .result {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #4CAF50; 
+            color: white; 
+            border-radius: 4px;
+            font-size: 20px; 
+            text-align: center; 
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); 
+            border: 1px solid #3e8e41; 
+            visibility: hidden; 
+        }
+
+        .footer {
+            background-color: transparent; 
+            color: #fff;
+            text-align: center;
+            padding: 10px 0;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="container">
+        <h1>Event Forecasting using Ridge Regression</h1>
+    </div>
+</header>
+
+<div class="container">
+    <div class="form-container">
+        <h1>Predict Event Signups</h1>
+        <form>
+            <label for="fiveWeekSignups">Current Number of Signups:</label>
+            <input type="number" id="fiveWeekSignups" name="fiveWeekSignups" required>
+            
+            <label for="advertisements">Number of Advertisements:</label>
+            <input type="number" id="advertisements" name="advertisements" required>
+            
+            <label for="targetAudience">Target Audience:</label>
+            <select id="targetAudience" name="targetAudience">
+                <option value="IT Managers">IT Managers</option>
+                <option value="Property Managers">Property Managers</option>
+                <option value="Education Property Managers">Education Property Managers</option>
+                <option value="Education Managers">Education Managers</option>
+                <option value="Generic">Generic</option>
+            </select>
+            
+            <button type="submit">Predict Signups</button>
+        </form>
+    </div>
+
+    <div class="result" id="predictionResult">
+        
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const form = document.querySelector("form");
+        const resultDiv = document.getElementById("predictionResult");
+
+        form.addEventListener("submit", function(e) {
+            e.preventDefault(); 
+                        const formData = new FormData(form);
+            const data = {};
+            formData.forEach((value, key) => { data[key] = value; });
+
+           
+            const jsonData = JSON.stringify(data);
+
+            
+            fetch("/", {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: jsonData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.prediction) {
+                    resultDiv.textContent = `Predicted Signups: ${data.prediction}`;
+                    resultDiv.style.visibility = 'visible'; 
+                } else {
+                    resultDiv.textContent = "Prediction failed. Please try again.";
+                    resultDiv.style.visibility = 'visible'; 
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                resultDiv.textContent = "An error occurred. Please try again.";
+                resultDiv.style.visibility = 'visible'; 
+            });
+        });
+    });
+</script>
+
+</body>
+</html>
